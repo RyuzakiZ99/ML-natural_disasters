@@ -20,24 +20,27 @@ Para remover ambiente virtual e demais diretórios criados:
 
 ## Como Rodar o Programa - Windows
 
-Criar o ambiente virtual:
+1. Criar o ambiente virtual:
 
 ```python3 -m venv venv```
 
-Ativar o ambiente virtual:
+2. Ativar o ambiente virtual:
 
 ```.\venv\Scripts\Activate.ps1```
 
-Instalar as dependencias:
+3. Instalar as dependencias:
 
 ```pip install -r requirements.txt```
 
-Agora pode-se rodar a análise EDA e o spot-checking separadamente.
+4. Agora pode-se rodar a análise EDA e o spot-checking separadamente.
+
 Para rodar a análise EDA:
+
 ```python3 eda.py```
 
 Para rodar o spot-checking:
+
 ```python3 spot_checking.py```
 
-Por fim, para desativar o ambiente virtual criado:
+5. Por fim, para desativar o ambiente virtual criado:
 ```deactivate```
