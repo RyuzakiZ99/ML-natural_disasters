@@ -43,4 +43,5 @@ Para rodar o spot-checking:
 ```python3 spot_checking.py```
 
 5. Por fim, para desativar o ambiente virtual criado:
+
 ```deactivate```
