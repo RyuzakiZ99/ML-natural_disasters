@@ -2,7 +2,7 @@
 
 O objetivo deste trabalho é a realização da caracterização de um problema de modelagem preditiva de classificação e a implementação e execução de *spot-checking* para a tarefa escolhida.
 
-Para esta aplicação foi escolhido um dataset relacionado à previsão da possibilidade de ocorrência de tsunami considerando os dados de um terremoto. o dataset original está disponível [aqui](https://www.kaggle.com/datasets/ahmeduzaki/global-earthquake-tsunami-risk-assessment-dataset/data).
+Para esta aplicação foi escolhido um dataset relacionado à previsão da possibilidade de ocorrência de tsunami considerando os dados de um terremoto. O dataset original está disponível [aqui](https://www.kaggle.com/datasets/ahmeduzaki/global-earthquake-tsunami-risk-assessment-dataset/data).
 
 ## Como Rodar o Programa - Linux
 
