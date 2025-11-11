@@ -6,7 +6,7 @@ Para esta aplicação foi escolhido um dataset relacionado à previsão da possi
 
 ## Como Rodar o Programa - Linux
 
-Para apenas iniciar o ambiente virtual e iniciar:
+Para apenas iniciar o ambiente virtual e iniciar (não é necessário criar um pyenv manualmente):
 
 ```make```
 
