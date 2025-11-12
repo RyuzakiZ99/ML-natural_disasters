@@ -6,42 +6,42 @@ Para esta aplicação foi escolhido um dataset relacionado à previsão da possi
 
 ## Como Rodar o Programa - Linux
 
-Para apenas iniciar o ambiente virtual e iniciar (não é necessário criar um pyenv manualmente):
+### Para apenas iniciar o ambiente virtual e iniciar:
 
-```make```
+    make
 
-Para realizar a inicialização adequada e rodar o programa:
+### Para realizar a inicialização adequada e rodar o programa:
 
-```make run```
+    make run
 
-Para remover ambiente virtual e demais diretórios criados:
+### Para remover ambiente virtual e demais diretórios criados:
 
-```make clean```
+    make clean
 
 ## Como Rodar o Programa - Windows
 
-1. Criar o ambiente virtual:
+### 1. Criar o ambiente virtual:
 
-```python3 -m venv venv```
+    python3 -m venv venv
 
-2. Ativar o ambiente virtual:
+### 2. Ativar o ambiente virtual:
 
-```.\venv\Scripts\Activate.ps1```
+    .\venv\Scripts\Activate.ps1
 
-3. Instalar as dependencias:
+### 3. Instalar as dependencias:
 
-```pip install -r requirements.txt```
+    pip install -r requirements.txt
 
-4. Agora pode-se rodar a análise EDA e o spot-checking separadamente.
+### 4. Agora pode-se rodar a análise EDA e o spot-checking separadamente.
 
-Para rodar a análise EDA:
+### 4.1 Para rodar a análise EDA:
 
-```python3 eda.py```
+    python3 eda.py
 
-Para rodar o spot-checking:
+### 4.2 Para rodar o spot-checking:
 
-```python3 spot_checking.py```
+    python3 spot_checking.py
 
-5. Por fim, para desativar o ambiente virtual criado:
+### 5. Por fim, para desativar o ambiente virtual criado:
 
-```deactivate```
+    deactivate

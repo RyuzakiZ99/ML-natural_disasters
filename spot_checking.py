@@ -59,6 +59,7 @@ print("Realizando Divisão de Dados e Normalização")
 x = df.iloc[:, :-1]
 y = df.iloc[:, -1]
 
+# Divisão de dados usado como exemplo para gerar os plots
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42, stratify=y)
 
 scaler = MinMaxScaler()
@@ -101,20 +102,21 @@ plt.close()
 
 print ("Realizando Treinamento, Predição e Resultados")
 
-repetir = 10
-modelos = {
+repetir = 10 # Número de repetições
+base_seed = 50 # Valor base para reprodutibilidade dos testes
+modelos = { # Modelos testados
     "KNN": KNeighborsClassifier(n_neighbors=5),
     "Naive Bayes": GaussianNB(),
     "Árvore de Decisão": DecisionTreeClassifier(random_state=42),
-    "Regressão Logística": LogisticRegression(random_state=42, max_iter=1000), # max_iter aumentada
-    "Redes Neurais (MLP)": MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000, random_state=42)
+    "Regressão Logística": LogisticRegression(random_state=42, max_iter=1000),
+    "Redes Neurais": MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000, random_state=42)
 }
-resultados_acuracia = {nome: [] for nome in modelos.keys()}
+resultados_acuracia = {nome: [] for nome in modelos.keys()} # Para guardar resultados da acurácia
 
-for i in range(1, repetir+ 1):
+for i in range(1, repetir + 1):
     print("Realizando itereção número:", i)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, stratify=y)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=(base_seed + i), stratify=y)
 
     scaler = MinMaxScaler()
     scaler.fit(x_train)
@@ -123,16 +125,16 @@ for i in range(1, repetir+ 1):
 
     for nome, modelo in modelos.items():
         nome_subdir = nome.replace(' ', '_').lower().replace('(', '').replace(')', '')
-        caminho_sub = os.path.join(DIRETORIO_DESTINO_RES, nome_subdir)
-        if not os.path.exists(caminho_sub):
-            os.makedirs(caminho_sub)
+        caminho_sub_modelo = os.path.join(DIRETORIO_DESTINO_RES, nome_subdir)
+        if not os.path.exists(caminho_sub_modelo):
+            os.makedirs(caminho_sub_modelo)
 
         modelo.fit(x_train, y_train)
         y_pred = modelo.predict(x_test)
         results = classification_report(y_test, y_pred, digits=4)
 
         nome_arquivo = f"relatorio_{nome.replace(' ', '_').lower()}_{i}.txt"
-        caminho_completo_relatorio = os.path.join(caminho_sub, nome_arquivo)
+        caminho_completo_relatorio = os.path.join(caminho_sub_modelo, nome_arquivo)
         
         with open(caminho_completo_relatorio, 'w') as f:
             f.write(results)
@@ -153,7 +155,7 @@ df_resultados.to_csv(os.path.join(DIRETORIO_DESTINO_RES,'resultados_spot_checkin
 media_por_modelo = df_resultados.mean()
 desvio_padrao_por_modelo = df_resultados.std()
 
-nome_arquivo = f"relatorio_media_desvio.txt"
+nome_arquivo = f"relatorio_acc_media_desvio.txt"
 caminho_completo_relatorio = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo)
         
 with open(caminho_completo_relatorio, 'w') as f:
