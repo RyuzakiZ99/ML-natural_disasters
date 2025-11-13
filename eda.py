@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 DIRETORIO_DESTINO_RAIZ = 'plots_eda'
 DIRETORIO_DESTINO_HIST = 'histogramas'
 DIRETORIO_DESTINO_BOX = 'boxplot'
+DIRETORIO_DESTINO_ALVO = 'alvo'
 DATASET = 'earthquake_data_tsunami.csv'
 
 # Carregamento dos Dados
@@ -23,6 +24,10 @@ if not os.path.exists(caminho_histogramas):
 caminho_boxplot = os.path.join(DIRETORIO_DESTINO_RAIZ, DIRETORIO_DESTINO_BOX)
 if not os.path.exists(caminho_boxplot):
     os.makedirs(caminho_boxplot)
+
+caminho_alvo = os.path.join(DIRETORIO_DESTINO_RAIZ, DIRETORIO_DESTINO_ALVO)
+if not os.path.exists(caminho_alvo):
+    os.makedirs(caminho_alvo)
 
 # -------------------- Definições para os Plots --------------------
 
@@ -90,3 +95,25 @@ nome_arquivo = 'boxplot_geral.png'
 caminho_completo = os.path.join(caminho_boxplot, nome_arquivo)
 plt.savefig(caminho_completo, dpi=300)
 plt.close()
+
+# -------------------- Plot da Distribuição do Atributo Alvo --------------------
+
+target_col = df.columns[-1] # Só coluna alvo
+class_counts = df[target_col].value_counts() # Quantos elementos tem o atributo alvo
+
+plt.figure(figsize=(7, 5))
+class_counts.plot(kind='bar')
+
+plt.title(f'Distribuição de Classes da Coluna Alvo')
+plt.xlabel('Classe')
+plt.ylabel('Número de Instrâncias')
+
+for i, v in enumerate(class_counts): # Coloca os número em cima das barras
+    plt.text(i, v + 0.5, str(v), ha='center', va='bottom', fontsize=10)
+
+plt.xticks(rotation=0)
+plt.tight_layout()
+
+nome_arquivo = 'distribuicao_alvo.png'
+caminho_completo = os.path.join(caminho_alvo, nome_arquivo)
+plt.savefig(caminho_completo, dpi=300)
