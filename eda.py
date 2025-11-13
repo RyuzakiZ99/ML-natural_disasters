@@ -110,7 +110,7 @@ plt.close()
 
 # -------------------- Plot do Boxplot Geral --------------------
 
-df.drop(columns=['tsunami']).boxplot(figsize=(12, 6))
+df.drop(columns=['tsunami']).rename(columns=str.upper).boxplot(figsize=(12, 6))
 
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
