@@ -39,13 +39,23 @@ if not os.path.exists(DIRETORIO_DESTINO_RES):
 # -------------------- Definições para os Plots --------------------
 
 titulos_colunas = { # Nomes para os títulos dos gráficos
-    'magnitude': 'Magnitude do Terremoto (Escala Richter)', # Escala Richter (Preditor Primário)
+    'magnitude': 'Magnitude do Terremoto', # Escala Richter (Preditor Primário)
     'cdi': 'Medida de Impacto na População', # Community Decimal Intensity
     'mmi': 'Indicador de Danos Estruturais', # Modified Mercalli Intensity
     'sig' : 'Significância do Evento', # Event Significance Score/Medição Geral de Perigo
-    'depth' : 'Profundidade do Ponto Focal do Terremoto (Km)', # Mais próximo da superfície = pior o terremoto
+    'depth' : 'Profundidade do Ponto Focal do Terremoto', # Mais próximo da superfície = pior o terremoto
     'latitude' : 'Latitude do Epicentro', # Indicador de Proximidade ao Oceano 
     'longitude' : 'Longitude do Epicentro', # Indicador de Proximidade ao Oceano
+}
+
+unidades_colunas = { # Unidades para os títulos dos gráficos
+    'magnitude': 'escala richter',
+    'cdi': 'CDI (escala de 0 a 9)',
+    'mmi': 'MMI (escala de 0 a 12)',
+    'sig' : '',
+    'depth' : 'km',
+    'latitude' : 'graus',
+    'longitude' : 'graus',
 }
 
 # -------------------- Carregamento dos Dados / Divisão dos Dados / Normalização --------------------
@@ -77,8 +87,9 @@ axes = df_normalizado.hist(alpha=0.7, bins=20, figsize=(20, 8), layout=(3, 3), g
 
 for ax in axes.flatten():
     ax.set_ylabel('Frequência', fontsize=10)
-    ax.set_xlabel(f'{ax.get_title().lower()}', fontsize=10)
-    titulo_grafico = titulos_colunas.get(ax.get_title())
+    col_name = ax.get_title()  # capture original column name before we change the title
+    ax.set_xlabel(unidades_colunas.get(col_name, ''), fontsize=10)
+    titulo_grafico = titulos_colunas.get(col_name)
     ax.set_title(titulo_grafico)
 
 plt.tight_layout()
