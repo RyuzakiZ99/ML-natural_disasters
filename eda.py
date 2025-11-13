@@ -32,18 +32,33 @@ if not os.path.exists(caminho_alvo):
 # -------------------- Definições para os Plots --------------------
 
 titulos_colunas = { # Nomes para os títulos dos gráficos
-    'magnitude': 'Magnitude do Terremoto (Escala Richter)', # Escala Richter (Preditor Primário)
+    'magnitude': 'Magnitude do Terremoto', # Escala Richter (Preditor Primário)
     'cdi': 'Medida de Impacto na População', # Community Decimal Intensity
     'mmi': 'Indicador de Danos Estruturais', # Modified Mercalli Intensity
     'sig' : 'Significância do Evento', # Event Significance Score/Medição Geral de Perigo
     'nst' : 'Número de Estações de Monitoramento Sísmico', # Apenas para indicação de qualidade dos dados
     'dmin' : 'Distância para a Estação de Monitoramento Mais Próxima', # Apenas para indicação de qualidade dos dados
-    'gap' : 'Distância Azimutal Entre Estações (Graus)', # Confiabilidade da Localização (qualidade de dados)
-    'depth' : 'Profundidade do Ponto Focal do Terremoto (Km)', # Mais próximo da superfície = pior o terremoto
+    'gap' : 'Distância Azimutal Entre Estações', # Confiabilidade da Localização (qualidade de dados)
+    'depth' : 'Profundidade do Ponto Focal do Terremoto', # Mais próximo da superfície = pior o terremoto
     'latitude' : 'Latitude do Epicentro', # Indicador de Proximidade ao Oceano 
     'longitude' : 'Longitude do Epicentro', # Indicador de Proximidade ao Oceano
     'Year' : 'Ano', # Padrões Temporais
     'Month' : 'Mês', # Análise Sazonal
+}
+
+unidades_colunas = { # Unidades para os títulos dos gráficos
+    'magnitude': 'escala richter',
+    'cdi': 'CDI (escala de 0 a 9)',
+    'mmi': 'MMI (escala de 0 a 12)',
+    'sig' : '',
+    'nst' : 'número de estações',
+    'dmin' : 'km',
+    'gap' : 'graus',
+    'depth' : 'km',
+    'latitude' : 'graus',
+    'longitude' : 'graus',
+    'Year' : '',
+    'Month' : '',
 }
 
 print ("Gerando Plots EDA")
@@ -55,11 +70,19 @@ colunas_plt = df_features.columns
 
 for coluna in colunas_plt:
     titulo_grafico = titulos_colunas.get(coluna, coluna.capitalize())
+    unidade = unidades_colunas.get(coluna, '')
 
-    plt.figure(figsize=(8, 5))
-    df[coluna].hist(bins=20)
-    plt.title(f'Distribuição do Atributo: {titulo_grafico}')
+    plt.figure(figsize=(9, 6))
+    ax = df[coluna].hist(bins=20, grid=False)  # ax é o objeto axes criado pelo pandas
+    ax.set_title(f'Distribuição do Atributo: {titulo_grafico}')
+
+    xlabel = titulo_grafico
+    if unidade:
+        xlabel = f'{unidade}'
+        ax.set_xlabel(xlabel)
     
+    ax.set_ylabel('Frequência')
+
     nome_base = coluna.lower().replace(' ', '_')
     nome_arquivo = f'{nome_base}_hist.png'
     caminho_completo = os.path.join(caminho_histogramas, nome_arquivo)
@@ -73,7 +96,8 @@ axes = df.drop(columns=['tsunami']).hist(alpha=0.7, bins=20, figsize=(20, 8), la
 
 for ax in axes.flatten():
     ax.set_ylabel('Frequência', fontsize=10)
-    ax.set_xlabel(f'{ax.get_title().lower()}', fontsize=10)
+    x_label = unidades_colunas.get(ax.get_title())
+    ax.set_xlabel(f'{x_label}', fontsize=10)
     titulo_grafico = titulos_colunas.get(ax.get_title())
     ax.set_title(titulo_grafico)
 
