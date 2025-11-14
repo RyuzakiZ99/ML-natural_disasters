@@ -18,6 +18,10 @@ DIRETORIO_DESTINO_RAIZ = 'plots_pre'
 DIRETORIO_DESTINO_HIST = 'histogramas'
 DIRETORIO_DESTINO_BOX = 'boxplot'
 DIRETORIO_DESTINO_RES = 'resultados'
+DIRETORIO_DESTINO_ACC = 'acc'
+DIRETORIO_DESTION_RECALL = 'recall'
+DIRETORIO_DESTION_PRECISION = 'precision'
+DIRETORIO_DESTINO_MODELS = 'model_itterations'
 
 DATASET = 'earthquake_data_tsunami.csv'
 
@@ -148,6 +152,11 @@ modelos = { # Modelos testados
 }
 resultados_acuracia = {nome: [] for nome in modelos.keys()} # Para guardar resultados da acurácia
 resultados_recall = {nome: [] for nome in modelos.keys()} # Para guardar resultados do recall
+resultados_precision = {nome: [] for nome in modelos.keys()} # Para guardar resultados da precisão
+
+caminho_modelos_itterations = os.path.join(DIRETORIO_DESTINO_RES, DIRETORIO_DESTINO_MODELS)
+if not os.path.exists(caminho_modelos_itterations):
+    os.makedirs(caminho_modelos_itterations)
 
 for i in range(1, repetir + 1):
     print("Realizando itereção número:", i)
@@ -161,7 +170,7 @@ for i in range(1, repetir + 1):
 
     for nome, modelo in modelos.items():
         nome_subdir = nome.replace(' ', '_').lower().replace('(', '').replace(')', '')
-        caminho_sub_modelo = os.path.join(DIRETORIO_DESTINO_RES, nome_subdir)
+        caminho_sub_modelo = os.path.join(caminho_modelos_itterations, nome_subdir)
         if not os.path.exists(caminho_sub_modelo):
             os.makedirs(caminho_sub_modelo)
 
@@ -187,29 +196,55 @@ for i in range(1, repetir + 1):
         else:
             recall_pos = dici_results.get('macro avg', {}).get('recall', None)
 
+        precision_pos = None
+        if '1' in dici_results:
+            precision_pos = dici_results['1']['precision']
+        elif 1 in dici_results:  # no caso dos rótulos serem int keys em vez de str
+            precision_pos = dici_results[1]['precision']
+        else:
+            precision_pos = dici_results.get('macro avg', {}).get('precision', None)
+
 
         resultados_acuracia[nome].append(acuracia)
         resultados_recall[nome].append(recall_pos)
-
+        resultados_precision[nome].append(precision_pos)
 # -------------------- Resultados e Plot da Acurácia --------------------
 
-print("Coletando Dados da Acurácia e Recall")
+print("Coletando Dados e Gerando Resultados Finais")
 
 df_resultados_acc = pd.DataFrame(resultados_acuracia)
-df_resultados_acc.to_csv(os.path.join(DIRETORIO_DESTINO_RES,'resultados_spot_checking_acc.csv'), index=False)
+destino_acc = os.path.join(DIRETORIO_DESTINO_RES, DIRETORIO_DESTINO_ACC)
+if not os.path.exists(destino_acc):
+    os.makedirs(destino_acc)
+df_resultados_acc.to_csv(os.path.join(destino_acc,'resultados_spot_checking_acc.csv'), index=False)
 
+destino_recall = os.path.join(DIRETORIO_DESTINO_RES, DIRETORIO_DESTION_RECALL)
+if not os.path.exists(destino_recall):
+    os.makedirs(destino_recall)
 df_resultados_recall = pd.DataFrame(resultados_recall)
-df_resultados_recall.to_csv(os.path.join(DIRETORIO_DESTINO_RES,'resultados_spot_checking_recall.csv'), index=False)
+df_resultados_recall.to_csv(os.path.join(destino_recall,'resultados_spot_checking_recall.csv'), index=False)
+
+destino_precision = os.path.join(DIRETORIO_DESTINO_RES, DIRETORIO_DESTION_PRECISION)
+if not os.path.exists(destino_precision):
+    os.makedirs(destino_precision)
+df_resultados_precision = pd.DataFrame(resultados_precision)
+df_resultados_precision.to_csv(os.path.join(destino_precision,'resultados_spot_checking_precision.csv'), index=False)
 
 # Média e Desvio Padrão por Modelo
 media_por_modelo_acc = df_resultados_acc.mean()
 desvio_padrao_por_modelo_acc = df_resultados_acc.std()
 
+media_por_modelo_precision = df_resultados_precision.mean()
+desvio_padrao_por_modelo_precision = df_resultados_precision.std()
+
 nome_arquivo_acc = f"relatorio_acc_media_desvio.txt"
-caminho_completo_relatorio = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_acc)
+caminho_completo_relatorio = os.path.join(destino_acc, nome_arquivo_acc)
 
 nome_arquivo_recall = f"relatorio_recall_media_desvio.txt"
-caminho_completo_relatorio_recall = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_recall)
+caminho_completo_relatorio_recall = os.path.join(destino_recall, nome_arquivo_recall)
+
+nome_arquivo_precision = f"relatorio_precision_media_desvio.txt"
+caminho_completo_relatorio_precision = os.path.join(destino_precision, nome_arquivo_precision)
         
 with open(caminho_completo_relatorio, 'w') as f:
     f.write("Média por Modelo:\n")
@@ -225,6 +260,13 @@ with open(caminho_completo_relatorio_recall, 'w') as f:
     f.write("\n\nDesvio Padrão por Modelo:\n")
     f.write(desvio_padrao_por_modelo_recall.to_string())
 
+with open(caminho_completo_relatorio_precision, 'w') as f:
+    f.write("Média por Modelo:\n")
+    f.write(media_por_modelo_precision.to_string())
+    f.write("\n\nDesvio Padrão por Modelo:\n")
+    f.write(desvio_padrao_por_modelo_precision.to_string())
+
+
 # Boxplot da Acurácia
 df_resultados_acc.boxplot(figsize=(12, 6))
 
@@ -232,7 +274,7 @@ plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 
 nome_arquivo_acc = 'boxplot_acc.png'
-caminho_completo_acc = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_acc)
+caminho_completo_acc = os.path.join(destino_acc, nome_arquivo_acc)
 plt.savefig(caminho_completo_acc, dpi=300)
 plt.close()
 
@@ -243,8 +285,18 @@ plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 
 nome_arquivo_recall = 'boxplot_recall.png'
-caminho_completo_recall = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_recall)
+caminho_completo_recall = os.path.join(destino_recall, nome_arquivo_recall)
 plt.savefig(caminho_completo_recall, dpi=300)
+plt.close()
+
+df_resultados_precision.boxplot(figsize=(12, 6))
+
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+
+nome_arquivo_precision = 'boxplot_precision.png'
+caminho_completo_precision = os.path.join(destino_precision, nome_arquivo_precision)
+plt.savefig(caminho_completo_precision, dpi=300)
 plt.close()
 
 print("Spot-checking Finalizado")
