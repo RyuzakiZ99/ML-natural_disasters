@@ -82,6 +82,30 @@ x_test = scaler.transform(x_test)
 print ("Gerando Plots com Dados Normalizados")
 
 df_normalizado = pd.DataFrame(x_train, columns=x.columns)
+colunas_plt = x.columns
+
+
+for coluna in colunas_plt:
+    titulo_grafico = titulos_colunas.get(coluna, coluna.capitalize())
+    unidade = unidades_colunas.get(coluna, '')
+
+    plt.figure(figsize=(9, 6))
+    ax = df_normalizado[coluna].hist(bins=20, grid=False)  # ax é o objeto axes criado pelo pandas
+    ax.set_title(f'Distribuição do Atributo: {titulo_grafico}')
+
+    xlabel = titulo_grafico
+    if unidade:
+        xlabel = f'{unidade} (normalizado)'
+        ax.set_xlabel(xlabel)
+    
+    ax.set_ylabel('Frequência')
+
+    nome_base = coluna.lower().replace(' ', '_')
+    nome_arquivo = f'{nome_base}_norma_hist.png'
+    caminho_completo = os.path.join(caminho_histogramas, nome_arquivo)
+    
+    plt.savefig(caminho_completo, dpi=300, bbox_inches='tight')
+    plt.close()
 
 axes = df_normalizado.hist(alpha=0.7, bins=20, figsize=(20, 8), layout=(3, 3), grid=False, sharex=False, sharey=False)
 
