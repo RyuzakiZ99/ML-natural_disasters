@@ -147,6 +147,7 @@ modelos = { # Modelos testados
     "Redes Neurais": MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000, random_state=42)
 }
 resultados_acuracia = {nome: [] for nome in modelos.keys()} # Para guardar resultados da acurácia
+resultados_recall = {nome: [] for nome in modelos.keys()} # Para guardar resultados do recall
 
 for i in range(1, repetir + 1):
     print("Realizando itereção número:", i)
@@ -177,37 +178,73 @@ for i in range(1, repetir + 1):
         # Guardando Dados para Análise Detalhada da Acurácia (Métrica Principal)
         dici_results = classification_report(y_test, y_pred, output_dict=True)
         acuracia = dici_results['accuracy']
+
+        recall_pos = None
+        if '1' in dici_results:
+            recall_pos = dici_results['1']['recall']
+        elif 1 in dici_results:  # no caso dos rótulos serem int keys em vez de str
+            recall_pos = dici_results[1]['recall']
+        else:
+            recall_pos = dici_results.get('macro avg', {}).get('recall', None)
+
+
         resultados_acuracia[nome].append(acuracia)
+        resultados_recall[nome].append(recall_pos)
 
 # -------------------- Resultados e Plot da Acurácia --------------------
 
-print("Coletando Dados da Acurácia")
+print("Coletando Dados da Acurácia e Recall")
 
-df_resultados = pd.DataFrame(resultados_acuracia)
-df_resultados.to_csv(os.path.join(DIRETORIO_DESTINO_RES,'resultados_spot_checking_acc.csv'), index=False)
+df_resultados_acc = pd.DataFrame(resultados_acuracia)
+df_resultados_acc.to_csv(os.path.join(DIRETORIO_DESTINO_RES,'resultados_spot_checking_acc.csv'), index=False)
+
+df_resultados_recall = pd.DataFrame(resultados_recall)
+df_resultados_recall.to_csv(os.path.join(DIRETORIO_DESTINO_RES,'resultados_spot_checking_recall.csv'), index=False)
 
 # Média e Desvio Padrão por Modelo
-media_por_modelo = df_resultados.mean()
-desvio_padrao_por_modelo = df_resultados.std()
+media_por_modelo_acc = df_resultados_acc.mean()
+desvio_padrao_por_modelo_acc = df_resultados_acc.std()
 
-nome_arquivo = f"relatorio_acc_media_desvio.txt"
-caminho_completo_relatorio = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo)
+nome_arquivo_acc = f"relatorio_acc_media_desvio.txt"
+caminho_completo_relatorio = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_acc)
+
+nome_arquivo_recall = f"relatorio_recall_media_desvio.txt"
+caminho_completo_relatorio_recall = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_recall)
         
 with open(caminho_completo_relatorio, 'w') as f:
     f.write("Média por Modelo:\n")
-    f.write(media_por_modelo.to_string())
+    f.write(media_por_modelo_acc.to_string())
     f.write("\n\nDesvio Padrão por Modelo:\n")
-    f.write(desvio_padrao_por_modelo.to_string())
+    f.write(desvio_padrao_por_modelo_acc.to_string())
 
-# Boxplot
-df_resultados.boxplot(figsize=(12, 6))
+with open(caminho_completo_relatorio_recall, 'w') as f:
+    media_por_modelo_recall = df_resultados_recall.mean()
+    desvio_padrao_por_modelo_recall = df_resultados_recall.std()
+    f.write("Média por Modelo:\n")
+    f.write(media_por_modelo_recall.to_string())
+    f.write("\n\nDesvio Padrão por Modelo:\n")
+    f.write(desvio_padrao_por_modelo_recall.to_string())
+
+# Boxplot da Acurácia
+df_resultados_acc.boxplot(figsize=(12, 6))
 
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 
-nome_arquivo = 'boxplot_acc.png'
-caminho_completo = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo)
-plt.savefig(caminho_completo, dpi=300)
+nome_arquivo_acc = 'boxplot_acc.png'
+caminho_completo_acc = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_acc)
+plt.savefig(caminho_completo_acc, dpi=300)
+plt.close()
+
+# Boxplot do Recall
+df_resultados_recall.boxplot(figsize=(12, 6))
+
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+
+nome_arquivo_recall = 'boxplot_recall.png'
+caminho_completo_recall = os.path.join(DIRETORIO_DESTINO_RES, nome_arquivo_recall)
+plt.savefig(caminho_completo_recall, dpi=300)
 plt.close()
 
 print("Spot-checking Finalizado")
