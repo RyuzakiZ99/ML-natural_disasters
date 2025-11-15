@@ -18,8 +18,8 @@ install_deps: $(VENV_DIR) requirements.txt
 	$(PIP) install -r requirements.txt
 
 run: setup
-	$(VENV_DIR)/bin/python3 eda.py
-	$(VENV_DIR)/bin/python3 spot_checking.py
+	$(VENV_DIR)/bin/python3 src/eda.py
+	$(VENV_DIR)/bin/python3 src/spot_checking.py
 
 clean:
 	rm -rf $(PLOTS1_DIR)
