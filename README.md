@@ -1,6 +1,6 @@
-# Trabalho de Aprendizado de Máquina - Etapa 1
+# Trabalho de Aprendizado de Máquina - Etapa 1 e Etapa 2
 
-O objetivo deste trabalho é a realização da caracterização de um problema de modelagem preditiva de classificação e a implementação e execução de *spot-checking* para a tarefa escolhida.
+O objetivo deste trabalho é a realização da caracterização de um problema de modelagem preditiva de classificação e a implementação e execução de *spot-checking* para a tarefa escolhida. Após
 
 Para esta aplicação foi escolhido um dataset relacionado à previsão da possibilidade de ocorrência de tsunami considerando os dados de um terremoto. O dataset original está disponível [aqui](https://www.kaggle.com/datasets/ahmeduzaki/global-earthquake-tsunami-risk-assessment-dataset/data).
 
@@ -32,16 +32,14 @@ Para esta aplicação foi escolhido um dataset relacionado à previsão da possi
 
     pip install -r requirements.txt
 
-### 4. Agora pode-se rodar a análise EDA e o spot-checking separadamente.
+### 4. Agora pode-se rodar a análise EDA e o spot-checking:
 
-### 4.1 Para rodar a análise EDA:
+    python3 src/etapa1.py
 
-    python3 eda.py
+### 5. Depois pode-se rodar a otimização de hiperparâmetros e análise de desempenho:
 
-### 4.2 Para rodar o spot-checking:
+    python3 src/etapa2.py
 
-    python3 spot_checking.py
-
-### 5. Por fim, para desativar o ambiente virtual criado:
+### 6. Por fim, para desativar o ambiente virtual criado:
 
     deactivate

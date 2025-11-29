@@ -1,7 +1,5 @@
 VENV_DIR = venv
-PLOTS1_DIR = plots_eda
-PLOTS2_DIR = plots_pre
-RESUL_DIR = resultados
+ETAPA1_DIR = etapa_1
 
 PIP = $(VENV_DIR)/bin/pip
 
@@ -18,11 +16,8 @@ install_deps: $(VENV_DIR) requirements.txt
 	$(PIP) install -r requirements.txt
 
 run: setup
-	$(VENV_DIR)/bin/python3 src/eda.py
-	$(VENV_DIR)/bin/python3 src/spot_checking.py
+	$(VENV_DIR)/bin/python3 src/etapa1.py
 
 clean:
-	rm -rf $(PLOTS1_DIR)
-	rm -rf $(PLOTS2_DIR)
-	rm -rf $(RESUL_DIR)
+	rm -rf $(ETAPA1_DIR)
 	rm -rf $(VENV_DIR)
