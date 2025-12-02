@@ -78,7 +78,7 @@ x = df.iloc[:, :-1]
 y = df.iloc[:, -1]
 
 # Divisão dos Dados em Treinamento + Validação (CV) e Teste
-x_cv, x_test, y_cv, y_test = train_test_split(x, y, test_size = 0.2, random_state = 42, stratify = y)
+x_cv, x_test, y_cv, y_test = train_test_split(x, y, test_size = 0.2, random_state = 61, stratify = y)
 
 # Definição dos Folds
 folds = 5
@@ -92,12 +92,12 @@ def objective (trial, classifier_name, x_cv, y_cv, skf):
         modelo = KNeighborsClassifier(n_neighbors=n_neighbors)
     
     elif classifier_name == 'Naive Bayes':
-        var_smoothing = trial.suggest_float('var_smoothing', 1e-10, 1e-6)
+        var_smoothing = trial.suggest_float('var_smoothing', 1e-10, 1e-9, log=True)
         modelo = GaussianNB(var_smoothing=var_smoothing)
 
     else: # Árvore de Decisão
-        max_depth = trial.suggest_int('max_depth', 5, 30)
-        min_samples_split = trial.suggest_int('min_samples_split', 2, 20)
+        max_depth = trial.suggest_int('max_depth', 1, 10)
+        min_samples_split = trial.suggest_int('min_samples_split', 2, 15)
         modelo = DecisionTreeClassifier(max_depth=max_depth, min_samples_split=min_samples_split, random_state=42)
 
     pipeline = Pipeline([('scaler', MinMaxScaler()), ('model', modelo)])
@@ -113,7 +113,7 @@ for nome in modelos:
     print(f"Otimizando: {nome}")
 
     study = optuna.create_study(direction="maximize")
-    study.optimize((lambda trial: objective(trial, nome, x_cv, y_cv, skf)), n_trials=100)
+    study.optimize((lambda trial: objective(trial, nome, x_cv, y_cv, skf)), n_trials=200)
     
     best_params = study.best_params
 
@@ -139,11 +139,6 @@ print("----------------------------------------")
 
 print("Realizando a Análise de Desempenho")
 
-scaler = MinMaxScaler()
-scaler.fit(x_cv)
-x_cv = scaler.transform(x_cv)
-x_test = scaler.transform(x_test)
-
 resultados_acuracia = {nome: [] for nome in modelos}
 resultados_recall = {nome: [] for nome in modelos}
 resultados_precisao = {nome: [] for nome in modelos}
@@ -159,10 +154,12 @@ for nome, dados in melhores_resultados.items():
         modelo = GaussianNB(var_smoothing=dados['params']['var_smoothing'])
 
     elif nome == 'Árvore de Decisão':
-        modelo = DecisionTreeClassifier(max_depth=dados['params']['max_depth'], min_samples_split=dados['params']['min_samples_split'],random_state=42)
+        modelo = DecisionTreeClassifier(max_depth=None, min_samples_split=dados['params']['min_samples_split'],random_state=42)
 
-    modelo.fit(x_cv, y_cv)
-    y_pred = modelo.predict(x_test)
+    pipeline_final = Pipeline([('scaler', MinMaxScaler()), ('model', modelo)])
+    
+    pipeline_final.fit(x_cv, y_cv)
+    y_pred = pipeline_final.predict(x_test)
 
     acuracia = accuracy_score(y_test, y_pred)
     precisao = precision_score(y_test, y_pred)
