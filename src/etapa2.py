@@ -16,6 +16,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import PrecisionRecallDisplay
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -36,6 +37,7 @@ DIRETORIO_INTERPRETACAO = 'interpretacao'
 
 DIRETORIO_MATRIZ = 'matrizes_confusao'
 DIRETORIO_PLOTS = 'plots_metricas'
+DIRETORIO_PR = 'curvas_pr'
 
 DATASET = 'earthquake_data_tsunami.csv'
 
@@ -59,6 +61,10 @@ if not os.path.exists(caminho_int):
 caminho_matriz = os.path.join(caminho_ava, DIRETORIO_MATRIZ)
 if not os.path.exists(caminho_matriz):
     os.makedirs(caminho_matriz)
+
+caminho_pr = os.path.join(caminho_ava, DIRETORIO_PR)
+if not os.path.exists(caminho_pr):
+    os.makedirs(caminho_pr)
 
 # -------------------- Melhores Modelos da Etapa Anterior --------------------
 
@@ -139,6 +145,7 @@ print("----------------------------------------")
 
 print("Realizando a Análise de Desempenho")
 
+# Definições para a análise das métricas
 resultados_acuracia = {nome: [] for nome in modelos}
 resultados_recall = {nome: [] for nome in modelos}
 resultados_precisao = {nome: [] for nome in modelos}
@@ -161,10 +168,12 @@ for nome, dados in melhores_resultados.items():
     pipeline_final.fit(x_cv, y_cv)
     y_pred = pipeline_final.predict(x_test)
 
+    # Cálculo das Métricas
     acuracia = accuracy_score(y_test, y_pred)
     precisao = precision_score(y_test, y_pred)
     recall = recall_score(y_test, y_pred)
 
+    # Geração da Matriz de Confusão
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(8, 6))
 
@@ -180,6 +189,7 @@ for nome, dados in melhores_resultados.items():
     plt.savefig(caminho_plt_matriz, dpi=300, bbox_inches='tight')
     plt.close()
 
+    # Guardar Valores das Métricas
     conteudo_ava += f"Modelo: {nome}\n"
     conteudo_ava += f"- Acurácia: {acuracia}\n"
     conteudo_ava += f"- Precisão: {precisao}\n"
@@ -188,6 +198,15 @@ for nome, dados in melhores_resultados.items():
     resultados_acuracia[nome].append(acuracia)
     resultados_precisao[nome].append(precisao)
     resultados_recall[nome].append(recall)
+
+    # Para os Gráficos da Curva PR
+    y_probs = modelo.predict_proba(x_test.values)[:, 1]
+    
+    display = PrecisionRecallDisplay.from_predictions(y_test, y_probs)
+    display.ax_.set_title(f"Curva Precision-Recall do {nome}")
+
+    caminho_pr_modelo = os.path.join (caminho_pr, f'curva_pr_{nome}')
+    plt.savefig(caminho_pr_modelo, dpi=300)
 
 with open(caminho_res_ava, 'w') as f:
     f.write(conteudo_ava)
